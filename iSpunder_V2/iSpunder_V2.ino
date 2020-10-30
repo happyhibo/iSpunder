@@ -31,6 +31,11 @@
 
 */
 
+/*
+
+
+
+*/
 
 #include "config.h"
 
@@ -57,8 +62,15 @@ String My_ssid = "";
 String My_psk = "";
 String My_MySqlSrv = "";
 String My_MySqlPort = "";
+
+#ifdef DEBUG
+String My_iSpunderName = "Test";
+String My_SudName = "#9999";
+#else
 String My_iSpunderName = "";
 String My_SudName = "";
+#endif // DEBUG
+
 
 unsigned long buttonPressTimeStamp;
 
@@ -69,6 +81,10 @@ float anain;
 DeviceAddress OWDeviceAddress;
 DynamicJsonBuffer jsonBuffer;
 JsonVariant jsonVariant;
+
+WiFiClient client;
+MySQL_Connection conn(&client);
+MySQL_Cursor* cursor;
 
 
 bool isDebugEnabled()
@@ -160,6 +176,7 @@ void DisplayInfo(String Ausrichtung = "m", String Zeile1 = "", String Zeile2 = "
 	if (Zeilen >= 3) display.drawString(_Spalte3, _Zeile3, Zeile3);
 	if (Zeilen == 4) display.drawString(_Spalte4, _Zeile4, Zeile4);
 	display.display();
+	yield();
 }
 
 void initRelais() {
@@ -211,6 +228,7 @@ void getDSTemp() {
 	temp = roundf(temp * 10.0f) / 10.0f;
 	SerialOut(F("Temp: "), false);
 	SerialOut(temp);
+	yield();
 }
 
 void getPressure()
@@ -256,6 +274,7 @@ void initEncoder()
 	//BTNA.setDoubleClickHandler(handle_Btn);
 	//BTNA.setTripleClickHandler(handle_Btn);
 	delay(10);
+	yield();
 }
 
 void handle_Btn_pressed(Button2& btn) {
@@ -298,6 +317,7 @@ void handle_Enc(ESPRotary& enc) {
 	}
 	//SerialOut(F("Debug: Nummer= "), false);
 	//SerialOut(number);
+	yield();
 }
 
 void handle_Btn(Button2& btn) {
@@ -332,6 +352,7 @@ void handle_Btn(Button2& btn) {
 	SerialOut(F("Debug: Was pressed for "), false);
 	SerialOut(btn.wasPressedFor(),false);
 	SerialOut(F(" ms"));
+	yield();
 }
 
 void changeMessInterval() {
@@ -426,6 +447,7 @@ void handle_CarboValve() {
 	}
 
 	SerialOut(F("Exit handle_CarboValve"));
+	yield();
 }
 
 void handle_CarboPressure() {
@@ -501,7 +523,7 @@ void DisplayDaten() {
 		display.drawString(_S2, _Z4, String(sollcarbo) + " g/l");
 	}
 	display.display();
-
+	yield();
 }
 
 
@@ -599,54 +621,55 @@ void menueList() {
 	String _configSave2 = "N";
 	String _configSave3 = "N";
 	switch (menue) {
-	case 1: //Soll-Karbo
-		changeCarbo();
-		break;
-	case 2: //MessIntervall
-		changeMessInterval();
-		break;
-	case 3: //WiFi STA
-		connectWifi();
-		break;
-	case 4: //WiFi AP
-		init_WiFi_AP();
-		break;
-	case 5: //Save Config
-		if (My_psk != "" || My_ssid != "") {
-			writeConfigFile(WIFICONF);
-			_configSave1 = "Y";
-		}
-		if (My_MySqlSrv != "" || My_MySqlPort != "") {
-			writeConfigFile(MYSQLCONF);
-			_configSave2 = "Y";
-		}
-		writeConfigFile(KARBOCONF);
-		_configSave3 = "Y";
+		case 1: //Soll-Karbo
+			changeCarbo();
+			break;
+		case 2: //MessIntervall
+			changeMessInterval();
+			break;
+		case 3: //WiFi STA
+			connectWifi();
+			break;
+		case 4: //WiFi AP
+			init_WiFi_AP();
+			break;
+		case 5: //Save Config
+			if (My_psk != "" || My_ssid != "") {
+				writeConfigFile(WIFICONF);
+				_configSave1 = "Y";
+			}
+			if (My_MySqlSrv != "" || My_MySqlPort != "") {
+				writeConfigFile(MYSQLCONF);
+				_configSave2 = "Y";
+			}
+			writeConfigFile(KARBOCONF);
+			_configSave3 = "Y";
 
-		DisplayInfo("l", "Save Config", "Karbo = " + _configSave3, "Wifi = " + _configSave1, "MySql = " +_configSave2 );
-		delay(3000);
-		break;
-	case 6: //IP Adresse
-		BtnPress = false;
-		do {
-			BTNA.loop();
-			DisplayInfo("m", "STA Mode", "IP " + WiFi.localIP().toString());
-		} while (!BtnPress);
-		BtnPress = false;
-		break;
-	case 7: //Format SPIFF
-		SPIFFS.end();
-		SPIFFS.begin();
-		SerialOut(F("Formating SPIFFS: "), false);
-		SerialOut(SPIFFS.format());
-		SPIFFS.end();
-		break;
-	case 8: //Exit
-		break;
-	default:
-		;
+			DisplayInfo("l", "Save Config", "Karbo = " + _configSave3, "Wifi = " + _configSave1, "MySql = " +_configSave2 );
+			delay(3000);
+			break;
+		case 6: //IP Adresse
+			BtnPress = false;
+			do {
+				BTNA.loop();
+				DisplayInfo("m", "STA Mode", "IP " + WiFi.localIP().toString());
+			} while (!BtnPress);
+			BtnPress = false;
+			break;
+		case 7: //Format SPIFF
+			SPIFFS.end();
+			SPIFFS.begin();
+			SerialOut(F("Formating SPIFFS: "), false);
+			SerialOut(SPIFFS.format());
+			SPIFFS.end();
+			break;
+		case 8: //Exit
+			break;
+		default:
+			;
 	}
 	menue = 0;
+	yield();
 }
 
 bool connectWifi()
@@ -704,6 +727,7 @@ bool connectWifi()
 		}
 	}
 	menue = 0;
+	yield();
 }
 
 void init_WiFi_AP() {
@@ -732,6 +756,7 @@ void init_WiFi_AP() {
 	server.stop();
 	initWebserver();
 	DisplayInfo("m", "AP Mode", "IP " + myIP.toString(), "/wifi");
+	yield();
 	delay(5000);
 }
 
@@ -834,6 +859,7 @@ void handle_mysql() {
 	content += "</form><br>";
 	content += "</body></html>";
 	server.send(200, "text/html", content);
+	yield();
 }
 
 void handle_Wifi() {
@@ -901,6 +927,7 @@ void handle_Wifi() {
 	content += "</form><br>";
 	content += "</body></html>";
 	server.send(200, "text/html", content);
+	yield();
 }
 
 void handle_WebRoot() {
@@ -962,6 +989,7 @@ void handle_WebRoot() {
 	content += "<br>";
 	content += "</body></html>";
 	server.send(200, "text/html", content);
+	yield();
 }
 
 void handle_WebNotFound() {
@@ -1070,7 +1098,7 @@ bool readConfigFile(int config) {
 		f.close();
 		SPIFFS.end();
 	}
-	
+	yield();
 	SerialOut("Configfile loaded succesfully");
 	return true;
 }
@@ -1140,6 +1168,7 @@ bool writeConfigFile(int config) {
 		f.close();	
 	}
 	SPIFFS.end();
+	yield();
 	SerialOut("Config file was successfully saved");
 	return true;
 }
@@ -1173,20 +1202,64 @@ bool deleteConfigFile(int config) {
 			SPIFFS.remove(_configfile); 
 		}
 		SPIFFS.end();
+		yield();
 		SerialOut("Config file was successfully deleted");
 		return true;
 	}
 }
 
-void sendData() {
+void sendDataMySQL() {
+	SerialOut(F("Send data to mysql..."));
+#ifndef DEBUG
+	if (druck < 0 || temp < 0) {
+		SerialOut(F("No Send Data - return"));
+		return;
+	}
+#endif // !DEBUG
+	
+	cursor = new MySQL_Cursor(&conn);
 
+	//MySQL_Connection conn((Client *)&client);
+	SerialOut(F("Mysql Server Connecting..."), false);
+	if (conn.connect(server_addr, 3306, user, password))
+		SerialOut(F("OK!"));
+	else
+		SerialOut(F("FAILED!"));
+
+	String sSQL = "INSERT INTO iSpunder.Data (Timestamp, Name, SudName, ID, Temperatur, Druck, Karbo, SollKarbo) ";
+	sSQL += "VALUES (now(), '" + My_iSpunderName + "', '" +  My_SudName + "', " + String(ESP.getChipId()) + ", " + String(temp) + ", " + String(druck) + ", " + String(carbo) + ", " + String(sollcarbo) + " )";
+	SerialOut(sSQL);
+	const char* query = sSQL.c_str();
+
+	if (conn.connected()) {
+		SerialOut(F("MySQL Connect OK."));
+		bool isOK = cursor->execute(query);
+		if (isOK) {
+			SerialOut(F("Cursor OK."));
+		}
+		else
+		{
+			SerialOut(F("Cursor Failed."));
+		}
+	}
+
+	delete cursor;
+}
+
+
+void sendData() {
+	//sendet Daten an Raspi auf dem der Tozzi-Python-SVR 'iSpunder' läuft und Daten in Empfang nimmt!! 
+	// IP: 192.168.1.50  Port: 9505
+#ifndef DEBUG
 	SerialOut(F("Send data to mysql..."));
 	if (My_MySqlSrv == "" || druck < 0 || temp < 0) {
 		SerialOut(F("No Mysql-Server - return"));
 		return;
 	}
+#endif // !DEBUG
 
-	WiFiClient client;
+	//WiFiClient client;
+
 	jsonVariant = jsonBuffer.createObject();
 
 	jsonVariant["id"] = ESP.getChipId();
@@ -1199,6 +1272,15 @@ void sendData() {
 	//jsonVariant["relais"] = schaltrelais;
 
 	jsonVariant.printTo(Serial);
+
+	if (My_MySqlSrv == "")
+	{
+		My_MySqlSrv = "192.168.1.50";
+	}
+	if (My_MySqlPort == "")
+	{
+		My_MySqlPort = "9505";
+	}
 
 	if (client.connect(My_MySqlSrv.c_str(), My_MySqlPort.toInt()))
 	{
@@ -1216,25 +1298,30 @@ void sendData() {
 	{
 		timeout++;
 		delay(1);
+		yield();
 	}
 	while (client.available())
 	{
 		char c = client.read();
 		Serial.write(c);
+		yield();
 	}
 	client.stop();
 	delay(100); // allow gracefull session close
 	SerialOut(F("Exit SendData..."));
+	yield();
 }
 
 void reqData() {
+	yield();
 	reqDSTemp();
 	getDSTemp();
 	getPressure();
 	calcCarbo();
 	handle_CarboValve();
 	DisplayDaten();
-	sendData();
+	//sendData();
+	sendDataMySQL();
 }
 
 
@@ -1285,7 +1372,7 @@ void setup() {
 
 		}
 	}
-
+	yield();
 	delay(5000);
 	reqData();
 	SerialOut(F("Exit Setup..."));

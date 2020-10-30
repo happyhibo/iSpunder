@@ -28,8 +28,11 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
 
+#include <MySQL_Cursor.h>
+#include <MySQL_Connection.h>
 
-#define PROG_VERSION "1.0.1"
+
+#define PROG_VERSION "1.1.0"
 #define RELAISPIN D5
 #define ENCPINSW D7
 #define ENCPINDT D8
@@ -51,6 +54,11 @@ const char* ssidPass = ""; // Change your password access point
 const char* wifi_ip[4] = { "192", "168", "5", "1" }; // Change your ip local network
 const char* wifi_subnet[4] = { "255", "255", "255", "0" }; // Change your subnet local network
 const char* wifi_gateway[4] = { "192", "168", "5", "1" }; // Change your gateway local network
+IPAddress server_addr(192, 168, 1, 50);  // IP of the MySQL *server* here
+char user[] = "iSpunder"; // MySQL user login username
+char password[] = "iSpunder"; // MySQL user login password
+
+
 
 // Initialize the OLED display using Wire library
 //extern ESP_SSD1306 display(OLED_RESET); // FOR I2C
@@ -64,6 +72,7 @@ extern OneWire oneWire(OW_BUS);
 extern DallasTemperature OW(&oneWire);
 extern ESP8266WebServer server(80);
 //extern WiFiClient client;
+//extern MySQL_Connection conn((Client *)&client);
 
 
 #endif
