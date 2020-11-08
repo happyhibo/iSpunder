@@ -14,6 +14,7 @@
 	//#define DEBUG 1 // uncomment this line to enable serial diagnostic messages
 #endif
 
+
 #include <FS.h>
 #include <ArduinoJson.h>
 //#include <Bounce2.h>
@@ -32,7 +33,7 @@
 #include <MySQL_Cursor.h>
 #include <MySQL_Connection.h>
 
-#define PROG_VERSION "1.3.0"
+#define PROG_VERSION "1.3.1"
 #define RELAISPIN D5
 #define ENCPINSW D7
 #define ENCPINDT D8
@@ -59,10 +60,9 @@ char user[] = "iSpunder"; // MySQL user login username
 char password[] = "iSpunder"; // MySQL user login password
 
 
-
 // Initialize the OLED display using Wire library
 //extern ESP_SSD1306 display(OLED_RESET); // FOR I2C
-extern SSD1306Brzo display(ADDRESS, SDA, SCL);
+//extern SSD1306Brzo display(ADDRESS, SDA, SCL);
 //extern SSD1306 display(0x3C, sdaPin, sclPin);
 extern ESPRotary ESPR = ESPRotary(ENCPINDT, ENCPINCLK);
 extern Button2 BTNA = Button2(ENCPINSW);

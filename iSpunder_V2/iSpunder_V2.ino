@@ -32,10 +32,14 @@
 */
 
 /*
-
+	-V1.3.0
+		Ntp Client und OTA intrgriert
+	-V1.3.1
+		Karbo-Hysterese 'carbohyst' einstellbar
 
 
 */
+
 
 #include "config.h"
 
@@ -87,7 +91,7 @@ JsonVariant jsonVariant;
 WiFiClient client;
 MySQL_Connection conn(&client);
 MySQL_Cursor* cursor;
-
+SSD1306Brzo display(ADDRESS, SDA, SCL);
 
 bool isDebugEnabled()
 {
@@ -178,7 +182,187 @@ void DisplayInfo(String Ausrichtung = "m", String Zeile1 = "", String Zeile2 = "
 	if (Zeilen >= 3) display.drawString(_Spalte3, _Zeile3, Zeile3);
 	if (Zeilen == 4) display.drawString(_Spalte4, _Zeile4, Zeile4);
 	display.display();
-	yield();
+}
+
+void DisplayDaten() {
+
+	int _ABST = 15;
+	int _S1 = 0;
+	int _S2 = 58;
+	display.clear();
+	//display.display();
+	//if (!OLEDOnOff) return;
+	int _Z1 = 0;
+	display.drawString(_S1, _Z1, "Temp.: ");
+	if (temp < 9.9 && temp >= 0.0) {
+		display.drawString(_S2, _Z1, "0" + String(temp) + "  C");
+	}
+	else {
+		display.drawString(_S2, _Z1, String(temp) + "  C");
+	}
+	display.drawCircle(102, 5, 2);
+	int _Z2 = _Z1 + _ABST;
+	display.drawString(_S1, _Z2, "Druck :");
+	if (druck < 9.9 && druck >= 0.0) {
+		display.drawString(_S2, _Z2, "0" + String(druck) + " bar");
+	}
+	else {
+		display.drawString(_S2, _Z2, String(druck) + " bar");
+	}
+	int _Z3 = _Z2 + _ABST;
+	display.drawString(_S1, _Z3, "Karbo :");
+	if (carbo < 9.9 && carbo >= 0.0) {
+		display.drawString(_S2, _Z3, "0" + String(carbo) + " g/l");
+	}
+	else
+	{
+		display.drawString(_S2, _Z3, String(carbo) + " g/l");
+	}
+	int _Z4 = _Z3 + _ABST;
+	display.drawString(_S1, _Z4, "SoKar : ");
+	if (sollcarbo < 9.9 && sollcarbo >= 0.0) {
+		display.drawString(_S2, _Z4, "0" + String(sollcarbo) + " g/l");
+	}
+	else
+	{
+		display.drawString(_S2, _Z4, String(sollcarbo) + " g/l");
+	}
+	display.display();
+}
+
+void DisplayMenue() {
+	display.setTextAlignment(TEXT_ALIGN_LEFT);
+	display.setFont(ArialMT_Plain_16);
+	display.clear();
+	int _MenuePos = 1;
+	int _Abstand = 15;
+	int _S1 = 2;
+	int _S2 = 17;
+	int _Z1 = 2;
+	int _Z2 = _Z1 + _Abstand;
+	int _Z3 = _Z2 + _Abstand;
+	int _Z4 = _Z3 + _Abstand;
+	do {
+		ESPR.loop(); //encoder loop
+		BTNA.loop(); //button loop
+		if (encpos > oldencpos) {
+			_MenuePos += 1;
+			if (_MenuePos > 8) _MenuePos = 1;
+		}
+		else if (encpos < oldencpos) {
+			_MenuePos -= 1;
+			if (_MenuePos < 1) _MenuePos = 8;
+		}
+		if (encpos != oldencpos) {
+			display.clear();
+		}
+		display.drawRect(0, 0, 128, 64);
+		display.drawString(20, 1, "--- Menue ---");
+		display.drawLine(0, 18, 128, 18);
+		display.drawString(2, _Z3, ">");
+		display.drawString(117, _Z3, "<");
+		//display.drawRect(2, _Z3, 124, 17);
+		switch (_MenuePos) {
+		case 1:
+			display.drawString(_S2, _Z3, "Soll-Karbo");
+			display.display();
+			break;
+		case 2:
+			display.drawString(_S2, _Z3, "K-Hysterese");
+			display.display();
+			break;
+		case 3:
+			display.drawString(_S2, _Z3, "MessInterval");
+			display.display();
+			break;
+		case 4:
+			display.drawString(_S2, _Z3, "Wifi STA");
+			display.display();
+			break;
+		case 5:
+			display.drawString(_S2, _Z3, "Wifi AP");
+			display.display();
+			break;
+		case 6:
+			display.drawString(_S2, _Z3, "Save Config");
+			display.display();
+			break;
+		case 7:
+			display.drawString(_S2, _Z3, "IP Address");
+			display.display();
+			break;
+		case 8:
+			display.drawString(_S2, _Z3, "Format SPIFF");
+			display.display();
+			break;
+		case 9:
+			display.drawString(_S2, _Z3, "Exit");
+			display.display();
+			break;
+		}
+		menue = _MenuePos;
+		oldencpos = encpos;
+		yield();
+	} while (!BtnPress);
+	BtnPress = false;
+}
+
+void menueList() {
+	String _configSave1 = "N";
+	String _configSave2 = "N";
+	String _configSave3 = "N";
+	switch (menue) {
+	case 1: //Soll-Karbo
+		changeCarbo();
+		break;
+	case 2: //Karbo-Hysetese
+		changeCarboHysteresis();
+		break;
+	case 3: //MessIntervall
+		changeMessInterval();
+		break;
+	case 4: //WiFi STA
+		connectWifi();
+		break;
+	case 5: //WiFi AP
+		init_WiFi_AP();
+		break;
+	case 6: //Save Config
+		if (My_psk != "" || My_ssid != "") {
+			writeConfigFile(WIFICONF);
+			_configSave1 = "Y";
+		}
+		if (My_MySqlSrv != "" || My_MySqlPort != "") {
+			writeConfigFile(MYSQLCONF);
+			_configSave2 = "Y";
+		}
+		writeConfigFile(KARBOCONF);
+		_configSave3 = "Y";
+
+		DisplayInfo("l", "Save Config", "Karbo = " + _configSave3, "Wifi = " + _configSave1, "MySql = " + _configSave2);
+		delay(3000);
+		break;
+	case 7: //IP Adresse
+		BtnPress = false;
+		do {
+			BTNA.loop();
+			DisplayInfo("m", "STA Mode", "IP " + WiFi.localIP().toString());
+		} while (!BtnPress);
+		BtnPress = false;
+		break;
+	case 8: //Format SPIFF
+		SPIFFS.end();
+		SPIFFS.begin();
+		SerialOut(F("Formating SPIFFS: "), false);
+		SerialOut(SPIFFS.format());
+		SPIFFS.end();
+		break;
+	case 9: //Exit
+		break;
+	default:
+		;
+	}
+	menue = 0;
 }
 
 void initRelais() {
@@ -434,6 +618,49 @@ void changeCarbo() {
 	menue = 0;
 }
 
+
+void changeCarboHysteresis() {
+	SerialOut(F("Insert changeCarboHysteresis"));
+	SerialOut(BtnPress);
+	display.setTextAlignment(TEXT_ALIGN_LEFT);
+	display.setFont(ArialMT_Plain_16);
+	display.clear();
+	display.drawString(10, 2, "K-Hysterese");
+	do {
+		ESPR.loop(); //encoder loop
+		BTNA.loop(); //button loop
+		if (encpos > oldencpos) {
+			carbohyst += 0.05;
+			SerialOut(F("carbohyst ++ "), false);
+			SerialOut(carbohyst);
+		}
+		else if (encpos < oldencpos) {
+			carbohyst -= 0.05;
+			//if (carbohyst <= 0) carbohyst = 0;
+			SerialOut(F("carbohyst -- "), false);
+			SerialOut(carbohyst);
+		}
+		if (encpos != oldencpos) display.clear();
+		display.drawString(10, 2, "K-Hysterese");
+		display.drawRect(0, 0, 128, 64);
+		display.drawString(35, 37, String(carbohyst));
+		/*if (carbohyst < 9.9) {
+			display.drawString(35, 37, "0" + String(carbohyst));
+		}
+		else {
+			display.drawString(35, 37, String(carbohyst));
+		}*/
+		display.display();
+		oldencpos = encpos;
+		yield();
+	} while (!BtnPress);
+	BtnPress = false;
+	SerialOut(F("Exit changeCarboHysteresis"));
+	//display.clearDisplay();
+	menue = 0;
+}
+
+
 void handle_CarboValve() {
 	SerialOut(F("handle_CarboValve"));
 
@@ -465,7 +692,7 @@ void handle_CarboPressure() {
 		getPressure();
 		calcCarbo();
 		DisplayDaten();
-		if (carbo <= sollcarbo || BtnPress)
+		if (carbo <= sollcarbo - carbohyst || BtnPress)
 		{
 			checkCarbo = false;
 		}
@@ -481,198 +708,6 @@ void handle_CarboPressure() {
 	SerialOut(F("Exit handle_CarboPressure"));
 }
 
-void DisplayDaten() {
-
-	int _ABST = 15;
-	int _S1 = 0;
-	int _S2 = 58;
-	display.clear();
-	//display.display();
-	//if (!OLEDOnOff) return;
-	int _Z1 = 0;
-	display.drawString(_S1, _Z1, "Temp.: ");
-	if (temp < 9.9 && temp >= 0.0) {
-		display.drawString(_S2, _Z1, "0" + String(temp) + "  C");
-	}
-	else {
-		display.drawString(_S2, _Z1, String(temp) + "  C");
-	}
-	display.drawCircle(102, 5, 2);
-	int _Z2 = _Z1 + _ABST;
-	display.drawString(_S1, _Z2, "Druck :");
-	if (druck < 9.9 && druck >= 0.0) {
-		display.drawString(_S2, _Z2, "0" + String(druck) + " bar");
-	}
-	else {
-		display.drawString(_S2, _Z2, String(druck) + " bar");
-	}
-	int _Z3 = _Z2 + _ABST;
-	display.drawString(_S1, _Z3, "Karbo :");
-	if (carbo < 9.9 && carbo >= 0.0) {
-		display.drawString(_S2, _Z3, "0" + String(carbo) + " g/l");
-	}
-	else
-	{
-		display.drawString(_S2, _Z3, String(carbo) + " g/l");
-	}
-	int _Z4 = _Z3 + _ABST;
-	display.drawString(_S1, _Z4, "SoKar : ");
-	if (sollcarbo < 9.9 && sollcarbo >= 0.0) {
-		display.drawString(_S2, _Z4, "0" + String(sollcarbo) + " g/l");
-	}
-	else
-	{
-		display.drawString(_S2, _Z4, String(sollcarbo) + " g/l");
-	}
-	display.display();
-	yield();
-}
-
-
-void DisplayMenue() {
-	display.setTextAlignment(TEXT_ALIGN_LEFT);
-	display.setFont(ArialMT_Plain_16);
-	display.clear();
-	int _MenuePos = 1;
-	int _Abstand = 15;
-	int _S1 = 2;
-	int _S2 = 17;
-	int _Z1 = 2;
-	int _Z2 = _Z1 + _Abstand;
-	int _Z3 = _Z2 + _Abstand;
-	int _Z4 = _Z3 + _Abstand;
-	do {
-		ESPR.loop(); //encoder loop
-		BTNA.loop(); //button loop
-		if (encpos > oldencpos) {
-			_MenuePos += 1;
-			if (_MenuePos > 8) _MenuePos = 1;
-		}
-		else if (encpos < oldencpos) {
-			_MenuePos -= 1;
-			if (_MenuePos < 1) _MenuePos = 8;
-		}
-		if (encpos != oldencpos) {
-			display.clear();
-		}
-		display.drawRect(0, 0, 128, 64);
-		display.drawString(20, 1, "--- Menue ---");
-		display.drawLine(0, 18, 128, 18);
-		display.drawString(2, _Z3, ">");
-		display.drawString(117, _Z3, "<");
-		//display.drawRect(2, _Z3, 124, 17);
-		switch (_MenuePos) {
-			case 1:
-				//display.drawString(_S2, _Z2, "Exit");
-				display.drawString(_S2, _Z3, "Soll-Karbo");
-				//display.drawString(_S2, _Z4, "Wifi STA");
-				display.display();
-				break;
-			case 2:
-				//display.drawString(_S2, _Z2, "Exit");
-				display.drawString(_S2, _Z3, "MessInterval");
-				//display.drawString(_S2, _Z4, "Wifi STA");
-				display.display();
-				break;
-			case 3:
-				//display.drawString(_S2, _Z2, "Soll-Karbo");
-				display.drawString(_S2, _Z3, "Wifi STA");
-				//display.drawString(_S2, _Z4, "Wifi AP");
-				display.display();
-				break;
-			case 4:
-				//display.drawString(_S2, _Z2, "Wifi STA");
-				display.drawString(_S2, _Z3, "Wifi AP");
-				//display.drawString(_S2, _Z4, "Save Config");
-				display.display();
-				break;
-			case 5:
-				//display.drawString(_S2, _Z2, "Wifi AP");
-				display.drawString(_S2, _Z3, "Save Config");
-				//display.drawString(_S2, _Z4, "IP Address");
-				display.display();
-				break;
-			case 6:
-				//display.drawString(_S2, _Z2, "Save Config");
-				display.drawString(_S2, _Z3, "IP Address");
-				//display.drawString(_S2, _Z4, "Exit");
-				display.display();
-				break;
-			case 7:
-				//display.drawString(_S2, _Z2, "IP Address");
-				display.drawString(_S2, _Z3, "Format SPIFF");
-				//display.drawString(_S2, _Z4, "Soll-Karbo");
-				display.display();
-				break;
-			case 8:
-				//display.drawString(_S2, _Z2, "IP Address");
-				display.drawString(_S2, _Z3, "Exit");
-				//display.drawString(_S2, _Z4, "Soll-Karbo");
-				display.display();
-				break;
-		}
-		menue = _MenuePos;
-		oldencpos = encpos;
-		yield();
-	} while (!BtnPress);
-	BtnPress = false;
-}
-
-void menueList() {
-	String _configSave1 = "N";
-	String _configSave2 = "N";
-	String _configSave3 = "N";
-	switch (menue) {
-		case 1: //Soll-Karbo
-			changeCarbo();
-			break;
-		case 2: //MessIntervall
-			changeMessInterval();
-			break;
-		case 3: //WiFi STA
-			connectWifi();
-			break;
-		case 4: //WiFi AP
-			init_WiFi_AP();
-			break;
-		case 5: //Save Config
-			if (My_psk != "" || My_ssid != "") {
-				writeConfigFile(WIFICONF);
-				_configSave1 = "Y";
-			}
-			if (My_MySqlSrv != "" || My_MySqlPort != "") {
-				writeConfigFile(MYSQLCONF);
-				_configSave2 = "Y";
-			}
-			writeConfigFile(KARBOCONF);
-			_configSave3 = "Y";
-
-			DisplayInfo("l", "Save Config", "Karbo = " + _configSave3, "Wifi = " + _configSave1, "MySql = " +_configSave2 );
-			delay(3000);
-			break;
-		case 6: //IP Adresse
-			BtnPress = false;
-			do {
-				BTNA.loop();
-				DisplayInfo("m", "STA Mode", "IP " + WiFi.localIP().toString());
-			} while (!BtnPress);
-			BtnPress = false;
-			break;
-		case 7: //Format SPIFF
-			SPIFFS.end();
-			SPIFFS.begin();
-			SerialOut(F("Formating SPIFFS: "), false);
-			SerialOut(SPIFFS.format());
-			SPIFFS.end();
-			break;
-		case 8: //Exit
-			break;
-		default:
-			;
-	}
-	menue = 0;
-	yield();
-}
 
 bool connectWifi()
 {
@@ -1091,6 +1126,8 @@ bool readConfigFile(int config) {
 					sollcarbo = (double)json["SKARBO"];
 				if (json.containsKey("MINTERVAL"))
 					MessInterval = (ulong)json["MINTERVAL"];
+				if (json.containsKey("KARBOHYST"))
+					carbohyst = (double)json["KARBOHYST"];
 			}
 		}
 		else {
@@ -1154,6 +1191,7 @@ bool writeConfigFile(int config) {
 	if (config == KARBOCONF) {
 		json["SKARBO"] = sollcarbo;
 		json["MINTERVAL"] = MessInterval;
+		json["KARBOHYST"] = carbohyst;
 	}
 	// Open file for writing
 	File f = SPIFFS.open(_configfile, "w");
@@ -1173,7 +1211,7 @@ bool writeConfigFile(int config) {
 	}
 	SPIFFS.end();
 	yield();
-	SerialOut("Config file was successfully saved");
+	SerialOut(F("Config file was successfully saved"));
 	return true;
 }
 
@@ -1344,6 +1382,7 @@ void reqData() {
 
 
 
+
 // the setup function runs once when you press reset or power the board
 void setup() {
 	Serial.begin(115200);
@@ -1364,8 +1403,8 @@ void setup() {
 	SerialOut(F("Read KarboConfig..."));
 	if (!readConfigFile(KARBOCONF)) {
 		SerialOut(F("Failed to read sollkarbo configuration file, using default values"));
-		sollcarbo = 5.50;
-		MessInterval = 60000;
+		sollcarbo = 4.50;
+		MessInterval = 300000;
 	}
 
 	SerialOut(F("Connect Wifi..."));
@@ -1465,3 +1504,4 @@ void loop() {
 
 	yield();
 }
+
