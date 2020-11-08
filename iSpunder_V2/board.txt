@@ -1,0 +1,6 @@
+# iSpunder_V2 build property overrides
+#
+# network.password=123
+# network.auth_upload=yes
+# network.port=8266 
+

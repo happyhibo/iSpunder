@@ -27,12 +27,12 @@
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
+#include <NtpClientLib.h>
 
 #include <MySQL_Cursor.h>
 #include <MySQL_Connection.h>
 
-
-#define PROG_VERSION "1.1.0"
+#define PROG_VERSION "1.3.0"
 #define RELAISPIN D5
 #define ENCPINSW D7
 #define ENCPINDT D8
@@ -73,7 +73,6 @@ extern DallasTemperature OW(&oneWire);
 extern ESP8266WebServer server(80);
 //extern WiFiClient client;
 //extern MySQL_Connection conn((Client *)&client);
-
 
 #endif
 

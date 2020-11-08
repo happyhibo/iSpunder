@@ -48,6 +48,8 @@ int oldnumber = 0;
 int encpos = 0;
 int oldencpos = 0;
 int menue = 0;
+int timeZone = 1;
+int minutesTimeZone = 0;
 
 double carbo = 0.0;
 double carbohyst = 0.25;
@@ -719,8 +721,10 @@ bool connectWifi()
 		init_WiFi_AP();
 	}
 	else {
-		SerialOut(F("local ip: "), false);
-		SerialOut(WiFi.localIP());
+		//SerialOut(F("local ip: "), false);
+		//SerialOut(WiFi.localIP());
+		Serial.print(F("local ip: "));
+		Serial.println(WiFi.localIP());
 		DisplayInfo("m", "STA Mode", "IP " + WiFi.localIP().toString());
 		if (!readConfigFile(MYSQLCONF)) {
 			SerialOut(F("Failed to read mysql configuration file, using default values"));
@@ -1236,12 +1240,26 @@ void sendDataMySQL() {
 		bool isOK = cursor->execute(query);
 		if (isOK) {
 			SerialOut(F("Cursor OK."));
+			Serial.print(NTP.getTimeDateString());
+			Serial.println(F(" send OK: "));
+
 		}
 		else
 		{
 			SerialOut(F("Cursor Failed."));
+			Serial.print(NTP.getTimeDateString());
+			Serial.println(F(" !!send failed!!: "));
 		}
 	}
+	else
+	{
+		Serial.print(F("DB Connect: "));
+		Serial.println(conn.connected());
+	}
+
+	Serial.print(F("Uptime: "));
+	Serial.print(NTP.getUptimeString()); Serial.print(F(" since "));
+	Serial.println(NTP.getTimeDateString(NTP.getFirstSync()).c_str());
 
 	delete cursor;
 }
@@ -1337,6 +1355,7 @@ void setup() {
 	display.setFont(ArialMT_Plain_16);
 	display.clear();
 	DisplayInfo("m", "iSPUNDER", "V " + String(PROG_VERSION), "by HappyHibo");
+	Serial.println("iSPUNDER V" + String(PROG_VERSION) +" by HappyHibo");
 	SerialOut(F("Init Harware..."));
 	initEncoder();
 	initDSSensor();
@@ -1372,6 +1391,19 @@ void setup() {
 
 		}
 	}
+
+	StartOTA();
+	StartNTP();
+	Serial.println();
+	Serial.print(NTP.getTimeDateString()); Serial.print(F(" "));
+	Serial.println(NTP.isSummerTime() ? "Summer Time. " : "Winter Time. ");
+	Serial.print(F("WiFi is "));
+	Serial.print(WiFi.isConnected() ? "connected" : "not connected"); Serial.print(". IP: ");
+	IPAddress myIP = WiFi.localIP();
+	Serial.println(myIP);
+	Serial.print(F("Uptime: "));
+	Serial.print(NTP.getUptimeString()); Serial.print(F(" since "));
+	Serial.println(NTP.getTimeDateString(NTP.getFirstSync()).c_str());
 	yield();
 	delay(5000);
 	reqData();
@@ -1383,7 +1415,9 @@ void loop() {
 
 	BTNA.loop();
 	server.handleClient();
-	
+	HandleOTA();
+	HandleNTP();
+
 	if (millis() - DSreqTime >= MessInterval) {
 		reqData();
 	}

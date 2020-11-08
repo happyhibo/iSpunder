@@ -115,5 +115,7 @@ typedef long __PTRDIFF_TYPE__;
 #define noInterrupts() cli()
 
 #include "iSpunder_V2.ino"
+#include "iSpunder_NTP.ino"
+#include "iSpunder_OTA.ino"
 #endif
 #endif

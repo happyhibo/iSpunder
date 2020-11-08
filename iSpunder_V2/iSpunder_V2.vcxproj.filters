@@ -16,6 +16,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="iSpunder_V2.ino" />
+    <None Include="iSpunder_OTA.ino" />
+    <None Include="iSpunder_NTP.ino" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">
@@ -24,5 +26,8 @@
     <ClInclude Include="__vm\.iSpunder_V2.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="board.txt" />
   </ItemGroup>
 </Project>
