@@ -36,16 +36,18 @@
 		Ntp Client und OTA intrgriert
 	-V1.3.1
 		Karbo-Hysterese 'carbohyst' einstellbar
-
+	-V1.4.0
+		Menueerweiterung. SudId einstellbar & ResetFlag in DB setzen
+		NTP Lib 3.20 neu
 
 */
-
 
 #include "config.h"
 
 bool BtnPress = false;
 bool DSrequested = false;
 bool checkCarbo = false;
+bool setResetFlag = false;
 
 int number = 0;
 int oldnumber = 0;
@@ -76,6 +78,7 @@ String My_SudName = "#9999";
 String My_iSpunderName = "";
 String My_SudName = "";
 #endif // DEBUG
+int My_SudID;
 
 
 unsigned long buttonPressTimeStamp;
@@ -92,6 +95,8 @@ WiFiClient client;
 MySQL_Connection conn(&client);
 MySQL_Cursor* cursor;
 SSD1306Brzo display(ADDRESS, SDA, SCL);
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 3600, 60000);
 
 bool isDebugEnabled()
 {
@@ -247,11 +252,11 @@ void DisplayMenue() {
 		BTNA.loop(); //button loop
 		if (encpos > oldencpos) {
 			_MenuePos += 1;
-			if (_MenuePos > 8) _MenuePos = 1;
+			if (_MenuePos > 11) _MenuePos = 1;
 		}
 		else if (encpos < oldencpos) {
 			_MenuePos -= 1;
-			if (_MenuePos < 1) _MenuePos = 8;
+			if (_MenuePos < 1) _MenuePos = 11;
 		}
 		if (encpos != oldencpos) {
 			display.clear();
@@ -284,18 +289,26 @@ void DisplayMenue() {
 			display.display();
 			break;
 		case 6:
-			display.drawString(_S2, _Z3, "Save Config");
+			display.drawString(_S2, _Z3, "Sud ID");
 			display.display();
 			break;
 		case 7:
-			display.drawString(_S2, _Z3, "IP Address");
+			display.drawString(_S2, _Z3, "Set Reset DB");
 			display.display();
 			break;
 		case 8:
-			display.drawString(_S2, _Z3, "Format SPIFF");
+			display.drawString(_S2, _Z3, "IP Address");
 			display.display();
 			break;
 		case 9:
+			display.drawString(_S2, _Z3, "Save Config");
+			display.display();
+			break;
+		case 10:
+			display.drawString(_S2, _Z3, "Format SPIFF");
+			display.display();
+			break;
+		case 11:
 			display.drawString(_S2, _Z3, "Exit");
 			display.display();
 			break;
@@ -327,7 +340,22 @@ void menueList() {
 	case 5: //WiFi AP
 		init_WiFi_AP();
 		break;
-	case 6: //Save Config
+	case 6: //Sud ID
+		changeSudID();
+		break;
+	case 7: //Set Reset in DB
+		setResetFlag = true;
+		reqData();
+		break;
+	case 8: //IP Adresse
+		BtnPress = false;
+		do {
+			BTNA.loop();
+			DisplayInfo("m", "STA Mode", "IP " + WiFi.localIP().toString());
+		} while (!BtnPress);
+		BtnPress = false;
+		break;
+	case 9: //Save Config
 		if (My_psk != "" || My_ssid != "") {
 			writeConfigFile(WIFICONF);
 			_configSave1 = "Y";
@@ -342,22 +370,14 @@ void menueList() {
 		DisplayInfo("l", "Save Config", "Karbo = " + _configSave3, "Wifi = " + _configSave1, "MySql = " + _configSave2);
 		delay(3000);
 		break;
-	case 7: //IP Adresse
-		BtnPress = false;
-		do {
-			BTNA.loop();
-			DisplayInfo("m", "STA Mode", "IP " + WiFi.localIP().toString());
-		} while (!BtnPress);
-		BtnPress = false;
-		break;
-	case 8: //Format SPIFF
+	case 10: //Format SPIFF
 		SPIFFS.end();
 		SPIFFS.begin();
 		SerialOut(F("Formating SPIFFS: "), false);
 		SerialOut(SPIFFS.format());
 		SPIFFS.end();
 		break;
-	case 9: //Exit
+	case 11: //Exit
 		break;
 	default:
 		;
@@ -441,6 +461,13 @@ void calcCarbo() {
 	carbo = ((double)druck + 1.013) * (pow(2.71828182845904, (-10.73797 + (2617.25 / (temp + 273.15))))) * 10;
 	SerialOut(F("Karbo: "), false);
 	SerialOut(carbo);
+
+	// Quelle: http://braukaiser.com/wiki/index.php/Carbonation_Tables
+	// Cbeer = (Phead+1.013)*(2.71828182845904^(-10.73797+(2617.25/(Tbeer+273.15))))*10
+	// Cbeer - carbonation of the beer in g/l
+	// Phead - head pressure in bar
+	// Tbeer - temperature of the beer in C
+	// e = eulscher Zahl = 2.71828182845904
 }
 
 void initEncoder()
@@ -574,6 +601,45 @@ void changeMessInterval() {
 	SerialOut(F("Exit changeMessInterval"));
 	//display.clearDisplay();
 	menue = 0;
+
+}
+
+void changeSudID() {
+	
+	SerialOut(F("Insert changeSudID"));
+	SerialOut(BtnPress);
+	int _Sudid = My_SudID;
+
+	display.setTextAlignment(TEXT_ALIGN_LEFT);
+	display.setFont(ArialMT_Plain_16);
+	display.clear();
+	DisplayInfo("m", "Sud-ID", "#" + String(_Sudid));
+	do {
+		ESPR.loop(); //encoder loop
+		BTNA.loop(); //button loop
+		if (encpos > oldencpos) {
+			_Sudid += 1;
+		}
+		else if (encpos < oldencpos) {
+			_Sudid -= 1;
+			if (_Sudid <= 0) _Sudid = 0;
+		}
+		if (encpos != oldencpos) {
+			DisplayInfo("m", "Sud-ID", "#" + String(_Sudid));
+		}
+		display.display();
+		oldencpos = encpos;
+		yield();
+	} while (!BtnPress);
+	
+	SerialOut(F("Sud-ID #"), false);
+	SerialOut(_Sudid);
+	BtnPress = false;
+	SerialOut(F("Exit changeMessInterval"));
+	//display.clearDisplay();
+	menue = 0;
+	My_SudID = _Sudid;
+	My_SudName = String("#" + My_SudID);
 
 }
 
@@ -851,7 +917,8 @@ void handle_mysql() {
 		SerialOut(My_iSpunderName);
 	}
 	if (server.hasArg("SudName")) {
-		My_SudName = server.arg("SudName").c_str();
+		My_SudID = server.arg("SudName").toInt();
+		My_SudName = String ("#" + My_SudID);
 		server.sendHeader("Location", "/mysql");
 		server.sendHeader("Cache-Control", "no-cache");
 		//server.sendHeader("Set-Cookie", "ESPSESSIONID=1");
@@ -1118,8 +1185,10 @@ bool readConfigFile(int config) {
 					My_MySqlPort = (const char *)json["MYSQLPORT"];
 				if (json.containsKey("SPUNDERNAME"))
 					My_iSpunderName = (const char *)json["SPUNDERNAME"];
-				if (json.containsKey("SUDNAME"))
-					My_SudName = (const char *)json["SUDNAME"];
+				if (json.containsKey("SUDNAME")) {
+					My_SudID = (int)json["SUDNAME"];
+					My_SudName = String("#" + My_SudID);
+				}
 			}
 			if (config == KARBOCONF) {
 				if (json.containsKey("SKARBO"))
@@ -1186,7 +1255,7 @@ bool writeConfigFile(int config) {
 		json["MYSQLSRV"] = My_MySqlSrv;
 		json["MYSQLPORT"] = My_MySqlPort;
 		json["SPUNDERNAME"] = My_iSpunderName;
-		json["SUDNAME"] = My_SudName;
+		json["SUDNAME"] = My_SudID;
 	}
 	if (config == KARBOCONF) {
 		json["SKARBO"] = sollcarbo;
@@ -1258,7 +1327,7 @@ void sendDataMySQL() {
 		return;
 	}
 #endif // !DEBUG
-	
+	String sSQL;
 	cursor = new MySQL_Cursor(&conn);
 
 	//MySQL_Connection conn((Client *)&client);
@@ -1268,8 +1337,14 @@ void sendDataMySQL() {
 	else
 		SerialOut(F("FAILED!"));
 
-	String sSQL = "INSERT INTO iSpunder.Data (Timestamp, Name, SudName, ID, Temperatur, Druck, Karbo, SollKarbo) ";
-	sSQL += "VALUES (now(), '" + My_iSpunderName + "', '" +  My_SudName + "', " + String(ESP.getChipId()) + ", " + String(temp) + ", " + String(druck) + ", " + String(carbo) + ", " + String(sollcarbo) + " )";
+	if (setResetFlag) {
+		sSQL = "INSERT INTO iSpunder.Data (Timestamp, Name, SudName, ID, Temperatur, Druck, Karbo, SollKarbo, ResetFlag) ";
+		sSQL += "VALUES (now(), '" + My_iSpunderName + "', '" + My_SudName + "', " + String(ESP.getChipId()) + ", " + String(temp) + ", " + String(druck) + ", " + String(carbo) + ", " + String(sollcarbo) + ", 1 )";
+		setResetFlag = false;
+	} else {
+		sSQL = "INSERT INTO iSpunder.Data (Timestamp, Name, SudName, ID, Temperatur, Druck, Karbo, SollKarbo) ";
+		sSQL += "VALUES (now(), '" + My_iSpunderName + "', '" + My_SudName + "', " + String(ESP.getChipId()) + ", " + String(temp) + ", " + String(druck) + ", " + String(carbo) + ", " + String(sollcarbo) + " )";
+	}
 	SerialOut(sSQL);
 	const char* query = sSQL.c_str();
 
@@ -1278,14 +1353,14 @@ void sendDataMySQL() {
 		bool isOK = cursor->execute(query);
 		if (isOK) {
 			SerialOut(F("Cursor OK."));
-			Serial.print(NTP.getTimeDateString());
+			Serial.print(timeClient.getFormattedTime());
 			Serial.println(F(" send OK: "));
 
 		}
 		else
 		{
 			SerialOut(F("Cursor Failed."));
-			Serial.print(NTP.getTimeDateString());
+			Serial.print(timeClient.getFormattedTime());
 			Serial.println(F(" !!send failed!!: "));
 		}
 	}
@@ -1295,9 +1370,9 @@ void sendDataMySQL() {
 		Serial.println(conn.connected());
 	}
 
-	Serial.print(F("Uptime: "));
-	Serial.print(NTP.getUptimeString()); Serial.print(F(" since "));
-	Serial.println(NTP.getTimeDateString(NTP.getFirstSync()).c_str());
+	//Serial.print(F("Uptime: "));
+	//Serial.print(NTP.getUptimeString()); Serial.print(F(" since "));
+	//Serial.println(NTP.getTimeDateString(NTP.getFirstSync()).c_str());
 
 	delete cursor;
 }
@@ -1415,7 +1490,7 @@ void setup() {
 		SerialOut(F("Wifi Connect..."));
 		SerialOut(F("Starte Webserver"));
 		initWebserver();
-
+		timeClient.begin();
 	}
 	else
 	{
@@ -1432,17 +1507,17 @@ void setup() {
 	}
 
 	StartOTA();
-	StartNTP();
+	//StartNTP();
 	Serial.println();
-	Serial.print(NTP.getTimeDateString()); Serial.print(F(" "));
-	Serial.println(NTP.isSummerTime() ? "Summer Time. " : "Winter Time. ");
+	//Serial.print(timeClient.); Serial.print(F(" "));
+	//Serial.println(NTP.isSummerTime() ? "Summer Time. " : "Winter Time. ");
 	Serial.print(F("WiFi is "));
 	Serial.print(WiFi.isConnected() ? "connected" : "not connected"); Serial.print(". IP: ");
 	IPAddress myIP = WiFi.localIP();
 	Serial.println(myIP);
-	Serial.print(F("Uptime: "));
-	Serial.print(NTP.getUptimeString()); Serial.print(F(" since "));
-	Serial.println(NTP.getTimeDateString(NTP.getFirstSync()).c_str());
+	//Serial.print(F("Uptime: "));
+	//Serial.print(NTP.getUptimeString()); Serial.print(F(" since "));
+	//Serial.println(NTP.getTimeDateString(NTP.getFirstSync()).c_str());
 	yield();
 	delay(5000);
 	reqData();
@@ -1455,7 +1530,8 @@ void loop() {
 	BTNA.loop();
 	server.handleClient();
 	HandleOTA();
-	HandleNTP();
+	//HandleNTP();
+	timeClient.update();
 
 	if (millis() - DSreqTime >= MessInterval) {
 		reqData();

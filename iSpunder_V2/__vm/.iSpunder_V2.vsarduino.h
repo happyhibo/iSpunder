@@ -6,7 +6,7 @@
 			All non-arduino files created by visual micro and all visual studio project or solution files can be freely deleted and are not required to compile a sketch (do not delete your own code!).
 			Note: debugger breakpoints are stored in '.sln' or '.asln' files, knowledge of last uploaded breakpoints is stored in the upload.vmps.xml file. Both files are required to continue a previous debug session without needing to compile and upload again
 	
-	Hardware: LOLIN(WEMOS) D1 R2 & mini, Platform=esp8266, Package=esp8266
+	Hardware: LOLIN(WEMOS) D1 R2 & mini, Platform=esp8266, Package=esp
 */
 
 #if defined(_VMICRO_INTELLISENSE)
@@ -18,13 +18,15 @@
 #define _VMDEBUG 1
 #define __ets__
 #define ICACHE_FLASH
-#define NONOSDK22x_191024 1
+#define MMU_IRAM_SIZE 0x8000
+#define MMU_ICACHE_SIZE 0x8000
+#define NONOSDK22x_190703 1
 #define F_CPU 80000000L
 #define LWIP_OPEN_SRC
 #define TCP_MSS 536
 #define LWIP_FEATURES 1
 #define LWIP_IPV6 0
-#define ARDUINO 108012
+#define ARDUINO 108013
 #define ARDUINO_ESP8266_WEMOS_D1MINI
 #define ARDUINO_ARCH_ESP8266
 #define FLASHMODE_DIO
@@ -115,7 +117,6 @@ typedef long __PTRDIFF_TYPE__;
 #define noInterrupts() cli()
 
 #include "iSpunder_V2.ino"
-#include "iSpunder_NTP.ino"
 #include "iSpunder_OTA.ino"
 #endif
 #endif

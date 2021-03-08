@@ -1,6 +1,6 @@
 // NTP Handling
 
-#include <NtpClientLib.h>
+#include <NtpClientlib.h>
 
 boolean syncEventTriggered = false; // True if a time even has been triggered
 NTPSyncEvent_t ntpEvent; // Last triggered event

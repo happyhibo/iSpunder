@@ -5,7 +5,7 @@
 
 #pragma once
 #if defined(ARDUINO) && ARDUINO >= 100
-	#include "Arduino.h"
+	#include "arduino.h"
 #else
 	#include "WProgram.h"
 #endif
@@ -28,12 +28,13 @@
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266WiFi.h>
-#include <NtpClientLib.h>
 
 #include <MySQL_Cursor.h>
 #include <MySQL_Connection.h>
+#include <WiFiUdp.h>
+#include <NTPClient.h>
 
-#define PROG_VERSION "1.3.1"
+#define PROG_VERSION "1.4.0"
 #define RELAISPIN D5
 #define ENCPINSW D7
 #define ENCPINDT D8
