@@ -227,7 +227,7 @@ void getPressure()
 	//	Daraus ergibt sich die Geradengleichung y(in V) = x(in Bar) * 0,8V/Bar + 0,5V
 	//	Da ich y messe, die Gleichung nach x umstellen und es ergibt sich
 	//	x = (y - 0,5) / 0,8 (in Bar)
-	//	Da ich für 5V den Wert 1023 als reading erhalte, habe ich noch den Teilungsfaktor 1024/5 = 204,8 einfügen müssen.
+	//	Da ich fÃ¼r 5V den Wert 1023 als reading erhalte, habe ich noch den Teilungsfaktor 1024/5 = 204,8 einfÃ¼gen mÃ¼ssen.
 	//  x = (y / 204,8 - 0,5) / 0,8 (in Bar)
 	//  Quelle: https://forum.fhem.de/index.php/topic,51725.0.html
 }
@@ -277,7 +277,7 @@ void handle_Enc(ESPRotary& enc) {
 	if (enc.getDirection() == RE_LEFT) number--;
 	if (number != oldnumber)
 	{
-		if (number > oldnumber)   // < > Zeichen ändern = Encoderdrehrichtung ändern
+		if (number > oldnumber)   // < > Zeichen Ã¤ndern = Encoderdrehrichtung Ã¤ndern
 		{
 			if (number - oldnumber == 2) {
 				encpos++;
@@ -1338,7 +1338,7 @@ void loop() {
 		if (incomingChar == "delMySql") deleteConfigFile(MYSQLCONF);
 		if (incomingChar == "delKarbo") deleteConfigFile(KARBOCONF);
 		if (incomingChar == "Sudhaus") My_ssid = incomingChar;
-		if (incomingChar == "LenggrieserSudhaus3a!") My_psk = incomingChar;
+		if (incomingChar == "***********") My_psk = incomingChar;
 	}
 #endif // DEBUG
 
