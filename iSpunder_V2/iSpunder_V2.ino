@@ -451,7 +451,7 @@ void getPressure()
 	//	Daraus ergibt sich die Geradengleichung y(in V) = x(in Bar) * 0,8V/Bar + 0,5V
 	//	Da ich y messe, die Gleichung nach x umstellen und es ergibt sich
 	//	x = (y - 0,5) / 0,8 (in Bar)
-	//	Da ich f¸r 5V den Wert 1023 als reading erhalte, habe ich noch den Teilungsfaktor 1024/5 = 204,8 einf¸gen m¸ssen.
+	//	Da ich f√ºr 5V den Wert 1023 als reading erhalte, habe ich noch den Teilungsfaktor 1024/5 = 204,8 einf√ºgen m√ºssen.
 	//  x = (y / 204,8 - 0,5) / 0,8 (in Bar)
 	//  Quelle: https://forum.fhem.de/index.php/topic,51725.0.html
 }
@@ -509,7 +509,7 @@ void handle_Enc(ESPRotary& enc) {
 	if (enc.getDirection() == RE_LEFT) number--;
 	if (number != oldnumber)
 	{
-		if (number > oldnumber)   // < > Zeichen ‰ndern = Encoderdrehrichtung ‰ndern
+		if (number > oldnumber)   // < > Zeichen √§ndern = Encoderdrehrichtung √§ndern
 		{
 			if (number - oldnumber == 2) {
 				encpos++;
@@ -1379,7 +1379,7 @@ void sendDataMySQL() {
 
 
 void sendData() {
-	//sendet Daten an Raspi auf dem der Tozzi-Python-SVR 'iSpunder' l‰uft und Daten in Empfang nimmt!! 
+	//sendet Daten an Raspi auf dem der Tozzi-Python-SVR 'iSpunder' l√§uft und Daten in Empfang nimmt!! 
 	// IP: 192.168.1.50  Port: 9505
 #ifndef DEBUG
 	SerialOut(F("Send data to mysql..."));
@@ -1574,7 +1574,7 @@ void loop() {
 		if (incomingChar == "delMySql") deleteConfigFile(MYSQLCONF);
 		if (incomingChar == "delKarbo") deleteConfigFile(KARBOCONF);
 		if (incomingChar == "Sudhaus") My_ssid = incomingChar;
-		if (incomingChar == "LenggrieserSudhaus3a!") My_psk = incomingChar;
+		if (incomingChar == "**************") My_psk = incomingChar;
 	}
 #endif // DEBUG
 
