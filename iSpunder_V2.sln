@@ -1,20 +1,72 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.757
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33214.272
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "iSpunder_V2", "iSpunder_V2\iSpunder_V2.vcxproj", "{C3939B82-EF27-4300-82C9-A0DF15E73EAE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "iSpunder_2022.1", "iSpunder_2022.1\iSpunder_2022.1.vcxproj", "{0231006B-9C0E-4CE9-8BC0-20E9CF4CFAD2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EnccoderTest", "EnccoderTest\EnccoderTest.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "iSpunder_2021.2", "iSpunder_2021.2\iSpunder_2021.2.vcxproj", "{AABC694B-569B-4D5D-B25B-C14B5D426F18}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "iSpunder_2022.2", "iSpunder_2022.2\iSpunder_2022.2.vcxproj", "{1DAECB70-E2F6-4545-8E3D-FDEB009D3E35}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Button2-2.0.0-2.0.0", "iSpunder_2022.2\Libraries\Button2-2.0.0\2.0.0\Button2-2.0.0\Button2-2.0.0-2.0.0.vcxitems", "{6596F2AD-4209-4AE1-8F31-AFBEC1DB655F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "brzo_i2c-pre_release-1.3.2", "iSpunder_2022.2\Libraries\brzo_i2c-pre_release\1.3.2\brzo_i2c-pre_release\brzo_i2c-pre_release-1.3.2.vcxitems", "{B5F7CBB7-595B-47ED-80F4-7AA30C3BC6AE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "esp8266-oled-ssd1306-4.3.0-4.3.0", "iSpunder_2022.2\Libraries\esp8266-oled-ssd1306-4.3.0\4.3.0\esp8266-oled-ssd1306-4.3.0\esp8266-oled-ssd1306-4.3.0-4.3.0.vcxitems", "{CC91B40E-5054-43E6-9992-A4C62818EE72}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InfluxDB360-3.6.1", "iSpunder_2022.2\Libraries\InfluxDB360\3.6.1\InfluxDB360\InfluxDB360-3.6.1.vcxitems", "{783C1129-5673-46EE-B01B-A5D788D384BF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESP_Rotary-1.5.0", "iSpunder_2022.2\Libraries\ESP_Rotary\1.5.0\ESP_Rotary\ESP_Rotary-1.5.0.vcxitems", "{53C11AE2-8916-4B19-BA94-638E53FD0F2E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArduinoJson-6.17.3-6.17.3", "iSpunder_2022.2\Libraries\ArduinoJson-6.17.3\6.17.3\ArduinoJson-6.17.3\ArduinoJson-6.17.3-6.17.3.vcxitems", "{A6C641A3-2917-4935-8B33-82D6E089392C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DallasTemperature-3.9.0", "iSpunder_2022.2\Libraries\DallasTemperature\3.9.0\DallasTemperature\DallasTemperature-3.9.0.vcxitems", "{5371DFAC-28FD-463E-8FFA-536E2467C902}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OneWire-2.3.5", "iSpunder_2022.2\Libraries\OneWire\2.3.5\OneWire\OneWire-2.3.5.vcxitems", "{8E73AAFA-A1E1-4384-B87B-BB29C950F239}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		iSpunder_2022.2\Libraries\ArduinoJson-6.17.3\6.17.3\ArduinoJson-6.17.3\ArduinoJson-6.17.3-6.17.3.vcxitems*{1daecb70-e2f6-4545-8e3d-fdeb009d3e35}*SharedItemsImports = 4
+		iSpunder_2022.2\Libraries\brzo_i2c-pre_release\1.3.2\brzo_i2c-pre_release\brzo_i2c-pre_release-1.3.2.vcxitems*{1daecb70-e2f6-4545-8e3d-fdeb009d3e35}*SharedItemsImports = 4
+		iSpunder_2022.2\Libraries\Button2-2.0.0\2.0.0\Button2-2.0.0\Button2-2.0.0-2.0.0.vcxitems*{1daecb70-e2f6-4545-8e3d-fdeb009d3e35}*SharedItemsImports = 4
+		iSpunder_2022.2\Libraries\DallasTemperature\3.9.0\DallasTemperature\DallasTemperature-3.9.0.vcxitems*{1daecb70-e2f6-4545-8e3d-fdeb009d3e35}*SharedItemsImports = 4
+		iSpunder_2022.2\Libraries\esp8266-oled-ssd1306-4.3.0\4.3.0\esp8266-oled-ssd1306-4.3.0\esp8266-oled-ssd1306-4.3.0-4.3.0.vcxitems*{1daecb70-e2f6-4545-8e3d-fdeb009d3e35}*SharedItemsImports = 4
+		iSpunder_2022.2\Libraries\ESP_Rotary\1.5.0\ESP_Rotary\ESP_Rotary-1.5.0.vcxitems*{1daecb70-e2f6-4545-8e3d-fdeb009d3e35}*SharedItemsImports = 4
+		iSpunder_2022.2\Libraries\InfluxDB360\3.6.1\InfluxDB360\InfluxDB360-3.6.1.vcxitems*{1daecb70-e2f6-4545-8e3d-fdeb009d3e35}*SharedItemsImports = 4
+		iSpunder_2022.2\Libraries\OneWire\2.3.5\OneWire\OneWire-2.3.5.vcxitems*{1daecb70-e2f6-4545-8e3d-fdeb009d3e35}*SharedItemsImports = 4
+		iSpunder_2022.2\Libraries\DallasTemperature\3.9.0\DallasTemperature\DallasTemperature-3.9.0.vcxitems*{5371dfac-28fd-463e-8ffa-536e2467c902}*SharedItemsImports = 9
+		iSpunder_2022.2\Libraries\ESP_Rotary\1.5.0\ESP_Rotary\ESP_Rotary-1.5.0.vcxitems*{53c11ae2-8916-4b19-ba94-638e53fd0f2e}*SharedItemsImports = 9
+		iSpunder_2022.2\Libraries\Button2-2.0.0\2.0.0\Button2-2.0.0\Button2-2.0.0-2.0.0.vcxitems*{6596f2ad-4209-4ae1-8f31-afbec1db655f}*SharedItemsImports = 9
+		iSpunder_2022.2\Libraries\InfluxDB360\3.6.1\InfluxDB360\InfluxDB360-3.6.1.vcxitems*{783c1129-5673-46ee-b01b-a5d788d384bf}*SharedItemsImports = 9
+		iSpunder_2022.2\Libraries\OneWire\2.3.5\OneWire\OneWire-2.3.5.vcxitems*{8e73aafa-a1e1-4384-b87b-bb29c950f239}*SharedItemsImports = 9
+		iSpunder_2022.2\Libraries\ArduinoJson-6.17.3\6.17.3\ArduinoJson-6.17.3\ArduinoJson-6.17.3-6.17.3.vcxitems*{a6c641a3-2917-4935-8b33-82d6e089392c}*SharedItemsImports = 9
+		iSpunder_2022.2\Libraries\brzo_i2c-pre_release\1.3.2\brzo_i2c-pre_release\brzo_i2c-pre_release-1.3.2.vcxitems*{b5f7cbb7-595b-47ed-80f4-7aa30c3bc6ae}*SharedItemsImports = 9
+		iSpunder_2022.2\Libraries\esp8266-oled-ssd1306-4.3.0\4.3.0\esp8266-oled-ssd1306-4.3.0\esp8266-oled-ssd1306-4.3.0-4.3.0.vcxitems*{cc91b40e-5054-43e6-9992-a4c62818ee72}*SharedItemsImports = 9
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C3939B82-EF27-4300-82C9-A0DF15E73EAE}.Debug|x86.ActiveCfg = Debug|Win32
-		{C3939B82-EF27-4300-82C9-A0DF15E73EAE}.Debug|x86.Build.0 = Debug|Win32
-		{C3939B82-EF27-4300-82C9-A0DF15E73EAE}.Release|x86.ActiveCfg = Release|Win32
-		{C3939B82-EF27-4300-82C9-A0DF15E73EAE}.Release|x86.Build.0 = Release|Win32
+		{0231006B-9C0E-4CE9-8BC0-20E9CF4CFAD2}.Debug|x86.ActiveCfg = Debug|Win32
+		{0231006B-9C0E-4CE9-8BC0-20E9CF4CFAD2}.Debug|x86.Build.0 = Debug|Win32
+		{0231006B-9C0E-4CE9-8BC0-20E9CF4CFAD2}.Release|x86.ActiveCfg = Release|Win32
+		{0231006B-9C0E-4CE9-8BC0-20E9CF4CFAD2}.Release|x86.Build.0 = Release|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.ActiveCfg = Debug|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.Build.0 = Debug|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.ActiveCfg = Release|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.Build.0 = Release|Win32
+		{AABC694B-569B-4D5D-B25B-C14B5D426F18}.Debug|x86.ActiveCfg = Debug|Win32
+		{AABC694B-569B-4D5D-B25B-C14B5D426F18}.Debug|x86.Build.0 = Debug|Win32
+		{AABC694B-569B-4D5D-B25B-C14B5D426F18}.Release|x86.ActiveCfg = Release|Win32
+		{AABC694B-569B-4D5D-B25B-C14B5D426F18}.Release|x86.Build.0 = Release|Win32
+		{1DAECB70-E2F6-4545-8E3D-FDEB009D3E35}.Debug|x86.ActiveCfg = Debug|Win32
+		{1DAECB70-E2F6-4545-8E3D-FDEB009D3E35}.Debug|x86.Build.0 = Debug|Win32
+		{1DAECB70-E2F6-4545-8E3D-FDEB009D3E35}.Release|x86.ActiveCfg = Release|Win32
+		{1DAECB70-E2F6-4545-8E3D-FDEB009D3E35}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

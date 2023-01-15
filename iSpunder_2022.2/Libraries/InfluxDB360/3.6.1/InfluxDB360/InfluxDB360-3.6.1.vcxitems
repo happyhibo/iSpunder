@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding ="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" >
+  <PropertyGroup Label="Globals" >
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{783c1129-5673-46ee-b01b-a5d788d384bf}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\InfluxData.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\InfluxDb.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\InfluxDbClient.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\Options.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\Point.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\query\CsvReader.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\query\FluxParser.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\query\FluxTypes.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\query\HttpStreamScanner.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\util\helpers.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\InfluxData.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\InfluxDb.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\InfluxDbClient.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\InfluxDbCloud.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\Options.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\Point.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\WritePrecision.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\query\CsvReader.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\query\FluxParser.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\query\FluxTypes.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\query\HttpStreamScanner.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\util\debug.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\util\helpers.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="$(MSBuildThisFileDirectory)keywords.txt" />
+<Text Include="$(MSBuildThisFileDirectory)library.properties" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)CHANGELOG.md" />
+<None Include="$(MSBuildThisFileDirectory)library.properties.org" />
+<None Include="$(MSBuildThisFileDirectory)LICENSE" />
+<None Include="$(MSBuildThisFileDirectory)README.md" />
+  </ItemGroup>
+</Project>
